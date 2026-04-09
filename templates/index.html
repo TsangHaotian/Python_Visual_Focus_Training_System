@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>专注度自适应训练游戏</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  <div class="shell">
+    <header class="hero">
+      <div class="title">专注度自适应训练游戏</div>
+      <div class="subtitle">AI 实践应用 · 实时视觉感知 · 动态难度控制 · 可解释反馈</div>
+      <div class="hero-tags">
+        <span class="tag">Rule-Based Vision</span>
+        <span class="tag">Adaptive Gameplay</span>
+        <span class="tag">AI Explainability</span>
+      </div>
+    </header>
+
+    <div class="row-main">
+      <section class="panel cam-panel">
+        <h2>左侧：摄像头区域</h2>
+        <div class="cam-wrap">
+          <img id="cam-stream" src="{{ url_for('video_feed') }}" alt="摄像头" />
+        </div>
+        {% if not engine_ok and load_error_preview %}
+        <pre class="err-preview">模型状态：未就绪。摘要：{{ load_error_preview }}</pre>
+        {% endif %}
+      </section>
+
+      <section class="panel game-panel">
+        <h2>右侧：游戏区域（高度随专注度缓慢爬升；不够高时场景停滞；空格微调 / R 重开）</h2>
+        <canvas id="game-canvas" width="480" height="220"></canvas>
+      </section>
+    </div>
+
+    <section class="panel focus-panel">
+      <h2>专注度等级</h2>
+      <div class="focus-row">
+        <span id="focus-badge" class="focus-badge">当前专注度：—</span>
+        <span class="legend">0(红) 1(黄) 2(浅绿) 3(深绿)</span>
+      </div>
+    </section>
+
+    <section class="panel ai-panel">
+      <h2>AI 策略区</h2>
+      <p id="ai-line">AI 策略：— | 速度：— | 障碍高度：—</p>
+    </section>
+
+    <section class="panel session-panel">
+      <h2>游戏时长设置</h2>
+      <div class="session-controls">
+        <label for="duration-minutes">终点时长(分钟)</label>
+        <input id="duration-minutes" type="number" min="1" max="60" step="1" value="5" />
+        <button id="apply-duration-btn" type="button">应用并重开</button>
+      </div>
+      <div class="session-note">说明：长时间不专注会触发 AI 仁慈机制，超过 3 次将提前结束并给出总结。</div>
+    </section>
+
+    <section class="panel ai-response-panel">
+      <h2>🤖 AI 原始回复</h2>
+      <div class="ai-response-container">
+        <div id="ai-response" class="ai-response-box">
+          <div class="ai-response-placeholder">等待AI策略生成...</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel chart-panel">
+      <h2>专注度趋势图（最近 2 分钟）</h2>
+      <canvas id="chart-canvas" height="140"></canvas>
+    </section>
+
+    <footer class="status-bar">
+      <span id="status-line">【游戏状态】 进行中 | 时间：00:00 | 难度：—</span>
+    </footer>
+
+    <section class="panel summary-panel">
+      <h2>本局专注度总结</h2>
+      <div id="game-summary" class="summary-box">
+        <div class="ai-response-placeholder">游戏进行中，结束后自动生成总结...</div>
+      </div>
+    </section>
+  </div>
+
+  <div id="mercy-modal" class="mercy-modal hidden">
+    <div class="mercy-modal-content">
+      <div class="mercy-modal-title">AI 仁慈机制已触发</div>
+      <div id="mercy-modal-text" class="mercy-modal-text">检测到长时间不专注，已为你跳过部分障碍，请继续保持专注。</div>
+      <button id="mercy-modal-close" type="button">我知道了</button>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
